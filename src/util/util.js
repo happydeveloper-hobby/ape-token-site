@@ -2,6 +2,7 @@ import  { default as Web3 }  from "web3";
 import axios from "axios";
 import jsdom from "jsdom";
 import got from "got";
+import moment from "moment";
 import {
         ISATokenAddress, 
         BNBTokenAddress, 
@@ -60,6 +61,36 @@ class Util
                 console.log("err: ", err);
             })
         });
+    }
+
+    getAgoTime = function (txSecTime)
+    {
+        const dateToTime = date => date.toLocaleString();
+        var now = new Date();
+        let nowSecTime = Math.round(now.getTime() / 1000);
+        let diffSecTime = nowSecTime - txSecTime;
+        if(diffSecTime < 60)
+        {
+            return diffSecTime + " secs ago";
+        }
+        else if(diffSecTime < 3600)
+        {
+            return Math.round(diffSecTime / 60) + " mins ago";
+        }
+        else if(diffSecTime < 86400)
+        {
+            let hrs = Math.trunc(diffSecTime / 3600);
+            let mins = Math.trunc((diffSecTime % 3600) / 60);
+            mins = mins == 0 ? "" : mins + " mins";
+            return hrs + " hrs " + mins + " ago";
+        }
+        else
+        {
+            let days = Math.trunc(diffSecTime / 86400);
+            let hrs = Math.trunc((diffSecTime % 86400) / 3600); 
+            hrs = hrs == 0 ? "" : hrs + " hrs";
+            return days + " days " + hrs + " ago";
+        }
     }
 
     async getCurrentPrice() {
@@ -125,7 +156,6 @@ class Util
         let data = [lp1, lp2, lp3, lp4, lp5, lp6];
         const items = [];
         data.map((lp) => {
-            console.log("lp\n", lp);
             if(lp.status == "success" && lp.tokenBalance != 0)
                 items.push(lp);
         });
@@ -261,7 +291,7 @@ class Util
             ethereum(network: bsc) {
                 dexTrades(
                     baseCurrency: {is: "${tokenAddress}"}
-                    options: {desc: "block.height", limit: 50}
+                    options: {desc: "block.height", limit: 100}
                 ) {
                     block {
                         height
@@ -272,6 +302,12 @@ class Util
                     }
                     transaction {
                         hash
+                        txFrom{
+                            address
+                        }
+                        to{
+                            address
+                        }
                     }
                     sellCurrency {
                         symbol
@@ -291,7 +327,7 @@ class Util
                     }
                     exchange{
                         name
-                      }
+                    }
                 }
             }
         }`
@@ -307,7 +343,17 @@ class Util
         };
         console.log("lastTransactions",lastTransactions);
         lastTransactions.data = lastTransactions.data.map((each) => {
+
+            //test
+            console.log("===============");
+            let agoTime = this.getAgoTime(each.block.timestamp.unixtime);
+            let date = new Date(each.block.timestamp.unixtime * 1000);
+            let txDate = date.toLocaleString();
+            let from = each.transaction.txFrom.address;
+            let to = each.transaction.to.address;
+
             if (each.side === "BUY") {
+                
                 return { 
                     block: each.block.height, 
                     amount1: each.buyAmount, 
@@ -317,8 +363,10 @@ class Util
                     amount2: each.sellAmount, 
                     token2: each.sellCurrency.symbol, 
                     tokenAddress2: each.sellCurrency.address, 
-                    timestamp: each.block.timestamp.unixtime, 
-                    time: each.block.timestamp.time, 
+                    agoTime: agoTime, 
+                    time: txDate, 
+                    from:from,
+                    to:to,
                     tokenPriceUSD: (each.tradeAmount / each.buyAmount), 
                     side: each.side, 
                     hash: each.transaction.hash,
@@ -331,13 +379,15 @@ class Util
                     block: each.block.height, 
                     amount1: each.sellAmount, 
                     token1: each.sellCurrency.symbol, 
-                    tokenAddress1: each.buyCurrency.address, 
+                    tokenAddress1: each.sellCurrency.address, 
                     tradeAmountUSD: each.tradeAmount, 
                     amount2: each.buyAmount, 
                     token2: each.buyCurrency.symbol, 
-                    tokenAddress2: each.sellCurrency.address, 
-                    timestamp: each.block.timestamp.unixtime, 
-                    time: each.block.timestamp.time, 
+                    tokenAddress2: each.buyCurrency.address, 
+                    agoTime: agoTime, 
+                    time: txDate,
+                    from:from,
+                    to:to,
                     tokenPriceUSD: (each.tradeAmount / each.sellAmount), 
                     side: each.side, 
                     hash: each.transaction.hash,
@@ -363,7 +413,8 @@ class Util
         //     return 0;
         // });
 
-        let result = await fetch("https://bscscan.com/token/" + tokenAddress, test_header)
+        // let result = await fetch("https://bscscan.com/token/" + tokenAddress, test_header)
+        let result = await fetch("https://www.freecodecamp.org/")
         // let result = await fetch(BNBPriceURL)
             .then((response) => {
                 console.log("result", response);
@@ -413,6 +464,8 @@ class Util
             console.log("res:::", info);
             return info.result[0];
     }
+
+
 
 }
 

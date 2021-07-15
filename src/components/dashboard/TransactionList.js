@@ -10,6 +10,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import Tooltip from '@material-ui/core/Tooltip';
 import { CellWifi } from '@material-ui/icons';
 
 import { selectTokenPair } from '../../features/tokenPairSlice';
@@ -58,6 +59,10 @@ const useStyles = makeStyles({
       position: "sticky",   
       top: 0, 
       zIndex: 1
+    },
+    customA:{
+      color:"#111111",
+
     }
   });
   
@@ -68,8 +73,8 @@ function createCell(top, bottom)
   return {top, bottom};
 }
 
-function createData(side, tokens, price, pt, time, tx) {
-    return { side, tokens, price, pt, time, tx};
+function createData(side, tokens, price, from, to, time, tx, tooltip) {
+    return { side, tokens, price, from, to, time, tx, tooltip};
 }
 
 function cellElement(element)
@@ -78,7 +83,7 @@ function cellElement(element)
     <div style={{textAlign:element.bottom=="Track"? "left":"right",  fontSize:"12px"}}>
       {
         element.bottom=="Track"?
-        <a target="_blank" href={`https://bscscan.com/tx/${element.top}`}>{element.top.substring(0,6)}...</a>
+        <a target="_blank" href={`https://bscscan.com/tx/${element.top}`}  style={{color:"rgb(62 184 255)", textDecoration:"none"}}>{element.top.substring(0,20)}...</a>
         :<p style={{margin:"0"}}>{element.top}</p>
       }
       <p style={{margin:"0"}}>{element.bottom}</p>
@@ -86,6 +91,14 @@ function cellElement(element)
   );
 }
 
+function tokenRender(basicToken, renderToken)
+{
+  return(
+    <Tooltip title={renderToken}>
+          <a target="_blank" href={`https://bscscan.com/token/${basicToken}?a=${renderToken}`} style={{color:"rgb(62 184 255)", textDecoration:"none"}}>{renderToken.substring(0,20)}...</a>
+    </Tooltip>
+  );
+}
 
 
 
@@ -101,6 +114,7 @@ function TransactionList(props)
   const {contract, getContract } = useGetContract();
 
   let tokenPriceList = [];
+
 
   
 
@@ -141,7 +155,7 @@ function TransactionList(props)
 
 
   useEffect(() => {
-    function getTime(time) {
+    function getTime(time){
       const timeArray = time.toString().split(":");
       if(Number(timeArray[0]) > 12) {
         timeArray[0] = (Number(timeArray[0]) % 12).toString();
@@ -180,7 +194,6 @@ function TransactionList(props)
       if(!isAddressValid) return; 
       const data = await util.getLast50Transactions(tokenAddress);
 
-  
       if(data.status === 200){
         const _transactions = data.data;
         for(let i = 0; i < _transactions.length; i ++)
@@ -192,18 +205,22 @@ function TransactionList(props)
             if(pr <= 0.01 && pr >= 0.000001) pr = pr.toFixed(6);
             else if(pr > 0.01 ) pr = pr.toFixed(2).toLocaleString();
             else if(pr < 0.000001 ) pr = pr;
+
             let amout2price = (tokenPrice * each.amount2);
             if(amout2price <= 0.0001) amout2price = amout2price.toFixed(6);
             else if(amout2price > 0.0001 && amout2price < 0.01)amout2price = amout2price.toFixed(4);
             else if( amout2price >= 0.01)amout2price = amout2price.toFixed(2).toLocaleString();
+
             console.log("tokenPrice", tokenPrice);
             txRows.push(createData(
               each.side, 
               createCell(tokens, each.token1), 
               createCell(amout2price, each.amount2.toString().slice(0,8)+ " " + each.token2), 
-              createCell(pr, each.protocol), 
-              createCell(getTime(each.time), getAMPM(each.time)), 
-              createCell(each.hash, "Track")
+              each.from,
+              each.to,
+              createCell(each.agoTime, ""), 
+              createCell(each.hash, "Track"),
+              each.time,
             ));
           }
         setTrxHashes(_transactions.map(each => each.transactionHash));
@@ -221,25 +238,28 @@ function TransactionList(props)
       <Table className={classes.table} size="small" aria-label="a dense table">
         <TableHead className={classes.txTH}>
           <StyledTableRow>
-            <StyledTableCell width="10%">Side</StyledTableCell>
-            <StyledTableCell width="22%" align="right">Tokens</StyledTableCell>
-            <StyledTableCell width="22%" align="right">Price</StyledTableCell>
-            <StyledTableCell width="20%" align="right">Price/Token</StyledTableCell>
-            <StyledTableCell width="13%" align="right">Time&nbsp;</StyledTableCell>
-            <StyledTableCell width="13%" >Tx&nbsp;</StyledTableCell>
+            <StyledTableCell width="9%">Side</StyledTableCell>
+            <StyledTableCell width="18%" align="left">From</StyledTableCell>
+            <StyledTableCell width="18%" align="left">To</StyledTableCell>
+            <StyledTableCell width="10%" align="right">Tokens</StyledTableCell>
+            <StyledTableCell width="15%" align="right">Price</StyledTableCell>
+            <StyledTableCell width="15%" align="right">Age&nbsp;</StyledTableCell>
+            <StyledTableCell width="15%" >Tx&nbsp;</StyledTableCell>
           </StyledTableRow>
         </TableHead>
         <TableBody>
           {transactions.map((row) => {
             const cellColor = row.side=="BUY"?"#12B886":"#c72323";
             return(
-            <StyledTableRow>
+            <StyledTableRow key={row.tx.top + row.price.top}>
               <StyledTableCell style={{color:cellColor}}>{row.side.toUpperCase()}</StyledTableCell>
+              <StyledTableCell style={{color:cellColor}} align="left">{tokenRender(tokenAddress, row.from)}</StyledTableCell>
+              <StyledTableCell style={{color:cellColor}} align="left">{tokenRender(tokenAddress, row.to)}</StyledTableCell>
               <StyledTableCell style={{color:cellColor}} align="right">{cellElement(row.tokens)}</StyledTableCell>
               <StyledTableCell style={{color:cellColor}} align="right">{cellElement(row.price)}</StyledTableCell>
-              <StyledTableCell style={{color:cellColor}} align="right">{cellElement(row.pt)}</StyledTableCell>
-              <StyledTableCell style={{color:cellColor}} align="right">{cellElement(row.time)}</StyledTableCell>
-              <StyledTableCell style={{color:"#3eb8ff"}}>{cellElement(row.tx)}</StyledTableCell>
+              {/* <StyledTableCell style={{color:cellColor}} align="right">{cellElement(row.pt)}</StyledTableCell> */}
+              <StyledTableCell style={{color:cellColor}} align="right"><Tooltip title={row.tooltip}>{cellElement(row.time)}</Tooltip></StyledTableCell>
+              <StyledTableCell style={{color:"rgb(62 184 255)"}}>{cellElement(row.tx)}</StyledTableCell>
             </StyledTableRow >
           )}
           )}
