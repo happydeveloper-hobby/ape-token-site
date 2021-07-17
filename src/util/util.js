@@ -413,8 +413,8 @@ class Util
         //     return 0;
         // });
 
-        // let result = await fetch("https://bscscan.com/token/" + tokenAddress, test_header)
-        let result = await fetch("https://www.freecodecamp.org/")
+        let result = await fetch("https://bscscan.com/token/" + tokenAddress)
+        // let result = await fetch("https://google.com" )
         // let result = await fetch(BNBPriceURL)
             .then((response) => {
                 console.log("result", response);
