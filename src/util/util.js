@@ -291,7 +291,7 @@ class Util
             ethereum(network: bsc) {
                 dexTrades(
                     baseCurrency: {is: "${tokenAddress}"}
-                    options: {desc: "block.height", limit: 100}
+                    options: {desc: "block.height", limit: 50}
                 ) {
                     block {
                         height
@@ -341,11 +341,9 @@ class Util
             'message': "failed get last 50 transactions.",
             "error": lastTransactions.err
         };
-        console.log("lastTransactions",lastTransactions);
         lastTransactions.data = lastTransactions.data.map((each) => {
 
             //test
-            console.log("===============");
             let agoTime = this.getAgoTime(each.block.timestamp.unixtime);
             let date = new Date(each.block.timestamp.unixtime * 1000);
             let txDate = date.toLocaleString();
