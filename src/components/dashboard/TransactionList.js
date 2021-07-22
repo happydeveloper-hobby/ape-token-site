@@ -56,7 +56,6 @@ function tokenRender(basicToken, renderToken) {
   return (
     <div>
       <OverlayTrigger
-        key="top"
         placement="top"
         overlay={<Tooltip id="tooltip-top">{renderToken}</Tooltip>}
       >

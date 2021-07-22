@@ -5,6 +5,7 @@ module.exports = {
   BUSDTokenAddress: "0xe9e7cea3dedca5984780bafc599bd69add087d56",
   USDTTokenAddress: "0x55d398326f99059ff775485246999027b3197955",
   CAKETokenAddress: "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82",
+  SAFEMOONTokenAddress: "0x8076c74c5e3f5852037f31ff0093eeb8c8add8d3",
 
   // LP Staking Address
   LPAddressV1: "0xb6ec86562e0cd125b4a1586036b6f13d47fd09b6",

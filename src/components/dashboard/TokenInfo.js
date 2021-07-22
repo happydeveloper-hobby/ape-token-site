@@ -3,12 +3,14 @@ import { useSelector, useDispatch } from "react-redux";
 import { selectSearchToken } from "../../features/searchTokenSlice";
 import { change } from "../../features/tokenPairSlice";
 import {
-  NotificationContainer,
-  NotificationManager,
+    NotificationContainer,
+    NotificationManager,
 } from "react-notifications";
 import { Container, Row, Col } from "react-bootstrap";
 import MarketCap from "../widgets/marketcap";
 import LpHolding from "../widgets/lpholding";
+import TokenPrice from "../widgets/tokenprice";
+import SocialList from "../widgets/socialList";
 import "../../App.css";
 
 function TokenInfo(props) {
@@ -54,41 +56,17 @@ function TokenInfo(props) {
     })();
   }, [totalSupply]);
 
-  function addDefaultSrc(ev) {
-    ev.target.src = "https://bscscan.com/images/main/empty-token.png";
-  }
+
 
   return totalSupply === undefined ? (
     <div></div>
   ) : (
     <div>
-      <Row spacing={1}>
-        <Col xs={2}>
-          <img
-            src={
-              tokenInfo.symbol === undefined
-                ? `https://bscscan.com/images/main/empty-token.png`
-                : `https://assets.coincap.io/assets/icons/${tokenInfo.symbol.toLowerCase()}@2x.png`
-            }
-            onError={addDefaultSrc}
-            className="tokenImg"
-            alt="logo"
-          />
-        </Col>
-        <Col xs={10}>
-          <div className="tokenName">
-            {tokenInfo.name === undefined ? "" : tokenInfo.name + " - Prices"}
-          </div>
-          <Container className="tokenPair" justify="flex-start">
-            <p style={{ marginBottom: "0px" }}>
-              {tokenInfo.symbol === undefined
-                ? ""
-                : tokenInfo.symbol + "/BNB Pair"}
-            </p>
-            <p>{tokenInfo.symbol === undefined ? "" : "BSC (BEP20)"}</p>
-          </Container>
-        </Col>
-      </Row>
+      <TokenPrice
+        util = {util}
+        tokenAddress = {tokenAddress}
+        tokenInfo = {info}
+      />
 
       <Container style={{ padding: "0px" }}>
         <Row>Total Supply :</Row>
@@ -107,16 +85,7 @@ function TokenInfo(props) {
           />
         )}
         <Row style={{ marginTop: "10px" }}>Token Type: {info.tokenType}</Row>
-        {info.website == "" ? (
-          ""
-        ) : (
-          <Row style={{ marginTop: "10px" }}>
-            <a href={info.website} target="_blank" style={{ padding: "0px" }}>
-              {" "}
-              {tokenInfo.name} Website
-            </a>
-          </Row>
-        )}
+        <SocialList tokenInfo = {info} tokenAddress = {tokenAddress}/>
         <Row style={{ marginTop: "10px" }}>Token Decimals: {info.divisor}</Row>
         <Row style={{ marginTop: "10px" }}>
           <a
