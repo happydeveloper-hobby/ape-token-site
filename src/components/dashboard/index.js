@@ -47,7 +47,7 @@ function Dashboard() {
         <Col xs={12} md={4}>
           <TokenInfo util={util} />
         </Col>
-        <Col xs={12} md={8} style={{padding:"0px"}}>
+        <Col xs={12} md={8} style={{padding:"0px", height:"500px"}}>
           <TradingView />
         </Col>
       </Row>

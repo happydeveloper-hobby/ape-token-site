@@ -10,6 +10,7 @@ function TokenPrice(props) {
   const util = props.util;
   const tokenInfo = props.tokenInfo;
   const tokenAddress = props.tokenAddress;
+  const tokenLogo = props.tokenLogo;
   const [tokenPrice, setTokenPrice] = useState();
 
   useEffect(() => {
@@ -34,9 +35,10 @@ function TokenPrice(props) {
       <Col xs={2}>
         <img
           src={
-            tokenInfo.symbol === undefined
+            tokenLogo === undefined
               ? `https://bscscan.com/images/main/empty-token.png`
-              : `https://assets.coincap.io/assets/icons/${tokenInfo.symbol.toLowerCase()}@2x.png`
+              : tokenLogo
+              // : `https://assets.coincap.io/assets/icons/${tokenInfo.symbol.toLowerCase()}@2x.png`
           }
           onError={addDefaultSrc}
           className="tokenImg"

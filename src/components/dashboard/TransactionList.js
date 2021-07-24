@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Web3 from "web3";
 import {
@@ -59,13 +59,13 @@ function tokenRender(basicToken, renderToken) {
         placement="top"
         overlay={<Tooltip id="tooltip-top">{renderToken}</Tooltip>}
       >
-        <a
-          target="_blank"
-          href={`https://bscscan.com/token/${basicToken}?a=${renderToken}`}
-          style={{ color: "rgb(62 184 255)", textDecoration: "none" }}
-        >
-          {renderToken.substring(0, 20)}...
-        </a>
+          <a
+            target="_blank"
+            href={`https://bscscan.com/token/${basicToken}?a=${renderToken}`}
+            style={{ color: "rgb(62 184 255)", textDecoration: "none" }}
+          >
+            {renderToken.substring(0, 20)}...
+          </a>
       </OverlayTrigger>
     </div>
   );

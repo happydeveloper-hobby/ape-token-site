@@ -51,7 +51,6 @@ function getLogo(type) {
 }
 
 function cellSocial(socialLink, type) {
-  console.log("socialLink-type", type);
   return !socialLink ? (
     ""
   ) : (
@@ -63,14 +62,15 @@ function cellSocial(socialLink, type) {
         </Tooltip>
       }
     >
-      <a
-        className="socialItem"
-        href={type == "email" ? "mailto:" + socialLink : socialLink}
-        target="_blank"
-        style={{ marginRight: "5px", padding: "0px" }}
-      >
-        {getLogo(type)}
-      </a>
+        <a
+          // ref={ref}
+          className="socialItem"
+          href={type == "email" ? "mailto:" + socialLink : socialLink}
+          target="_blank"
+          style={{ marginRight: "5px", padding: "0px" }}
+        >
+          {getLogo(type)}
+        </a>
     </OverlayTrigger>
   );
 }

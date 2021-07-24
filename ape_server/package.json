@@ -1,0 +1,30 @@
+{
+  "name": "ape_node_server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ape",
+    "node",
+    "server"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.9"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-session": "^1.17.2",
+    "jsdom": "^16.6.0",
+    "node-cache": "^5.1.2",
+    "node-fetch": "^2.6.1",
+    "web3": "^1.4.0"
+  }
+}

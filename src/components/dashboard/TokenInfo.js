@@ -18,6 +18,7 @@ function TokenInfo(props) {
   const dispatch = useDispatch();
   const tokenAddress = useSelector(selectSearchToken);
   const [totalSupply, setTotalSupply] = useState({});
+  const [CMCInfo, setCMCInfo] = useState({});
   const [tokenInfo, setTokenInfo] = useState({
     totalSupply: "",
     total: "",
@@ -32,9 +33,10 @@ function TokenInfo(props) {
       if (!isAddressValid) {
         NotificationManager.warning(
           "The token address is invalid. Please input correct!"
-        );
-        return;
-      }
+          );
+          return;
+        }
+        let _cmcInfo = await util.getCryptoCurrencyInfo(tokenAddress);
       // const holders = await util.getCurrentHolders(tokenAddress);
       // console.log("holders", holders);
 
@@ -43,6 +45,8 @@ function TokenInfo(props) {
       let data = await util.getTotalSupply(tokenAddress);
       setTotalSupply(data);
       setInfo(info);
+      if( _cmcInfo == 0 ) _cmcInfo = {};
+      setCMCInfo(_cmcInfo);
     })();
   }, [tokenAddress]);
 
@@ -66,6 +70,7 @@ function TokenInfo(props) {
         util = {util}
         tokenAddress = {tokenAddress}
         tokenInfo = {info}
+        tokenLogo = {CMCInfo.logo}
       />
 
       <Container style={{ padding: "0px" }}>
@@ -86,6 +91,16 @@ function TokenInfo(props) {
         )}
         <Row style={{ marginTop: "10px" }}>Token Type: {info.tokenType}</Row>
         <SocialList tokenInfo = {info} tokenAddress = {tokenAddress}/>
+        {
+        CMCInfo.twitter_username != undefined ? 
+        <Row style={{ marginTop: "10px", display:"inline-flex"}}>
+          <p style={{padding:"0px", margin:"0px"}}>Twitter User Name:</p> 
+          <p style={{color:"yellow", padding:"0px", marginRight:"20px", textAlign:"end"}}>@{CMCInfo.twitter_username}</p>
+        </Row>
+        :
+        ""
+        }
+
         <Row style={{ marginTop: "10px" }}>Token Decimals: {info.divisor}</Row>
         <Row style={{ marginTop: "10px" }}>
           <a

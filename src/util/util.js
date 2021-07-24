@@ -20,6 +20,9 @@ import {
         axios_link,
         axios_bitquery_header,    
         test_header,
+        CMCApikey,
+        CMC_header,
+        apeAPI,
     } from "../constants/constant.js";
 
 const { JSDOM } = jsdom;
@@ -39,9 +42,9 @@ class Util
         this.PFV2 = new this.web3.eth.Contract(PancakeFactoryAbi, PancakeFactoryV2);
     }
 
-    axiosGetOperation = function (link, query, header) {
+    axiosGetOperation = function (link, header = "") {
         return new Promise(function (resolve, reject) {
-            axios.get(link,"", {header: header}).then(res => {
+            axios.get(link, {headers: header}).then(res => {
                 resolve(res)
                 console.log("done: ", res);
             }).catch(err => {
@@ -463,6 +466,12 @@ class Util
             return info.result[0];
     }
 
+    async getCryptoCurrencyInfo(symbol_or_address)
+    {
+        let data = await this.axiosGetOperation(apeAPI + "/getCryptoCurrencyInfo?symbol_or_address=" + symbol_or_address);
+        let info = data.data.data;
+        return info;
+    }
 
 
 }
